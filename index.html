@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media App</title>
+</head>
+
+<body>
+    <h1 id="header">Social Media App</h1>
+    <form onsubmit="handleEvent(event)" id="form">
+        <label for="postLink">Post Link:</label>
+        <br>
+        <input type="text" id="postLink" name="postLink" placeholder="Enter the img url">
+        <br>
+        <label for="postText">Post Text:</label>
+        <br>
+        <input type="text" id="postText" name="postText" placeholder="Enter the description">
+
+        <br>
+        <button type="submit">Create Post</button>
+    </form>
+    <div id="imageContainer"></div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
+<script>
+
+    async function handleEvent(event){
+        event.preventDefault();
+        const imageContainer = document.getElementById("imageContainer");
+
+        const imgUrl = event.target.postLink.value
+        const imgText = event.target.postText.value
+
+        let imgObj= {
+            postLink: imgUrl,
+            postText: imgText
+        }
+        const imgReq= await axios.post("http://localhost:3000/postImgData", imgObj)
+        const data = imgReq.data.newImgDetails
+        // console.log(data)
+        // creating image element with DOM
+
+        const imgDiv = document.createElement("div")
+
+        const img = document.createElement("img")
+        
+        img.src = imgUrl
+        img.style.height ="400px"
+        img.style.width ="300px"
+        imgDiv.appendChild(img)
+        imageContainer.appendChild(imgDiv);
+
+        const getAllImg = await axios.get("http://localhost:3000/getAllData")
+        // console.log(getAllImg)
+
+    }
+
+    document.addEventListener("DOMContentLoaded", function(event){
+        axios.get("http://localhost:3000/getAllData")
+        .then(response=>{
+            for(let i=0; i<response.data.allImgDetails.length; i++)
+            {
+                console.log(response.data.allImgDetails[i])
+                displayImg(response.data.allImgDetails[i])
+            }
+        }).catch(err=>{
+            console.log(err)
+        })
+    })
+
+    function displayImg(data){
+        const imageContainer = document.getElementById("imageContainer");
+        const imgDiv = document.createElement("div")
+        const img = document.createElement("img")
+        img.src = data.imgUrl
+        img.style.height ="400px"
+        img.style.width ="300px"
+        imgDiv.appendChild(img)
+        imageContainer.appendChild(imgDiv);
+
+    }
+    
+</script>
+</html>
